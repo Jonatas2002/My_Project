@@ -33,15 +33,15 @@ mascara = freq > 0
 
 # Signal 1
 Y1 = np.fft.fft(signal1)
-Amp1 = np.abs(Y1/nt)
+Amp1 = np.abs(Y1)
 
 # Signal 2
 Y2 = np.fft.fft(signal2)
-Amp2 = np.abs(Y2/nt)
+Amp2 = np.abs(Y2)
 
 # Signal 1
 Y3 = np.fft.fft(signal3)
-Amp3 = np.abs(Y3/nt)
+Amp3 = np.abs(Y3)
 
 
 """ Convolução no dominio da Frequencia"""
@@ -49,7 +49,7 @@ S_con = Y1 * Y2
 
 signal4 = np.fft.ifft(S_con)
 Y4 = np.fft.fft(signal4)
-Amp4 = np.abs(Y4/nt)
+Amp4 = np.abs(Y4)
 
 
 # Plot dos Graficos
