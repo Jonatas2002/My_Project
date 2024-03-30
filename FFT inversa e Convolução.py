@@ -1,5 +1,5 @@
 '''FFT inversa e Convolução
-Objetivo: Realizar a transformada inversa de Fourier de sinal ja conhecido 
+Objetivo: Realizar a transformada inversa de Fourier de sinal ja conhecido
 e comparar a convolução de dois sinais no dominio do tempo e da frequência
 
 Status do Projeto:
@@ -10,7 +10,7 @@ Convolução no dominio da Frequencia - OK
 
 Autor: Jonatas Oliveira de Araujo '''
 
-import numpy as np 
+import numpy as np
 import matplotlib.pyplot as plt
 
 # Parâmetros
@@ -25,7 +25,7 @@ signal1 = np.sin(time * 2*np.pi * fs1)
 signal2 = np.cos(time * 2*np.pi * fs2)
 
 # Convolução no dominio do tempo
-signal3 = np.convolve(signal1,signal2, 'same') 
+signal3 = np.convolve(signal1,signal2, 'same')
 
 # Trasnformada de Fourier
 freq = np.fft.fftfreq(nt, dt)
@@ -47,7 +47,7 @@ Amp3 = np.abs(Y3)
 """ Convolução no dominio da Frequencia"""
 S_con = Y1 * Y2
 
-signal4 = np.fft.ifft(S_con)
+signal4 = np.real(np.fft.ifft(S_con))
 Y4 = np.fft.fft(signal4)
 Amp4 = np.abs(Y4)
 
