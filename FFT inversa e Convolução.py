@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 # Parâmetros
 T = 1                       # Tempo (s)
-dt = 1/128                  # Taxa de Amostragem
+dt = 1/200                  # Taxa de Amostragem
 fs1 = 10                    # Frequência do sinal 1
 fs2 = 40                    # Frequência do sinal 2
 nt = int((T/dt) + 1)        # Numeros de Amostra
@@ -33,23 +33,23 @@ mascara = freq > 0
 
 # Signal 1
 Y1 = np.fft.fft(signal1)
-Amp1 = np.abs(Y1)
+Amp1 = np.abs(Y1/nt)
 
 # Signal 2
-Y2 = np.fft.fft(signal2)
-Amp2 = np.abs(Y2)
+Y2 = np.fft.fft(signal2/nt)
+Amp2 = np.abs(Y2/nt)
 
 # Signal 1
 Y3 = np.fft.fft(signal3)
-Amp3 = np.abs(Y3)
+Amp3 = np.abs(Y3/nt)
 
 
 """ Convolução no dominio da Frequencia"""
 S_con = Y1 * Y2
 
-signal4 = np.fft.ifft(S_con)
+signal4 = np.real(np.fft.ifft(S_con))
 Y4 = np.fft.fft(signal4)
-Amp4 = np.abs(Y4)
+Amp4 = np.abs(Y4/nt)
 
 
 # Plot dos Graficos
