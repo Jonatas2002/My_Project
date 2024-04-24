@@ -21,34 +21,26 @@ class Wavefield_1D():
         self.model = np.zeros(self.nz)
         self.depth = np.arange(self.nz) * self.dz
         self.times = np.arange(self.nt) * self.dt
-
         
-        self.prof = np.array([2000, 4000, 6000, 8000, 10010])
+        self.interface = np.array([2000, 4000, 6000, 8000, 10010])
         self.velocities = np.array([1500, 4000, 2000, 4500, 5000])
         
-        self.fonte = np.array([100, 500, 1000])
-        self.receptor = np.array([3000, 5000, 7000])
+        self.src = np.array([100, 500, 1000])
+        self.rec = np.array([3000, 5000, 7000])
         
-        self.src_projection = np.array(self.fonte / self.dz, dtype = int)
-        self.rec_projection = np.array(self.receptor / self.dz, dtype = int)
+        self.src_projection = np.array(self.src / self.dz, dtype = int)
+        self.rec_projection = np.array(self.rec / self.dz, dtype = int)
         
     def get_type(self):
         print(self.wave_type)
-        
-    def set_model(self):
-        interfaces = []
-        for i in range(len(self.prof)):
-            start_depth = int(self.prof[i - 1] / self.dz)  if i > 0 else 0
-            end_depth = self.prof[i] / self.dz
-            vel = self.velocities[i]
-            interfaces.append((start_depth, end_depth, vel))
 
-        for j in range(len(interfaces)):
-            start, end, vel = interfaces[j]
-            start_depth = int(start)
-            end_depth = int(end)
-            self.model[start_depth:end_depth] = vel
-            
+    def set_model(self):
+        self.model = np.zeros(self.nz)
+        for i in range(len(self.interface)):
+            start_interface = int(self.interface[i - 1] / self.dz) if i > 0 else 0
+            end_interface = int(self.interface[i]//self.dz)
+            self.model[start_interface:end_interface] = self.velocities[i]
+
     def set_wavelet(self):    
         
         t0 = 2.0*np.pi/self.fmax
@@ -62,19 +54,14 @@ class Wavefield_1D():
     def wave_propagation(self):
 
         self.P = np.zeros((self.nz, self.nt)) # P_{i,n}
-
-        sId = int(self.fonte[0] / self.dz)
+        sId = int(self.src[0] / self.dz)
 
         for n in range(1,self.nt-1):
-
             self.P[sId,n] += self.wavelet[n]    
-
             laplacian = get_laplacian_1D(self.P, self.dz, self.nz, n)
-
             self.P[:,n+1] = (self.dt*self.model)**2 * laplacian + 2.0*self.P[:,n] - self.P[:,n-1]
         
         self.P *= 1.0 / np.max(self.P) 
-
         self.seismogram = self.P[self.rec_projection,:].T 
             
     def plot_wavefield(self):
@@ -95,8 +82,8 @@ class Wavefield_1D():
     def plot_model(self):
         fig, ax = plt.subplots(figsize=(3, 6), clear=True)
         ax.plot(self.model, self.depth)
-        ax.plot(self.model[self.fonte //self.dz], self.fonte,  '*', color='red', label='Fonte', markersize = 10)
-        ax.plot(self.model[self.receptor//self.dz], self.receptor,   'v' , color='blue', label='Receptor', markersize = 10)
+        ax.plot(self.model[self.src //self.dz], self.src,  '*', color='red', label='Fonte', markersize = 10)
+        ax.plot(self.model[self.rec//self.dz], self.rec,   'v' , color='blue', label='Receptor', markersize = 10)
         ax.set_title("Velocity Model", fontsize=18)
         ax.set_xlabel("Velocity [m/s]", fontsize=15)
         ax.set_ylabel("Depth [m]", fontsize=15) 
@@ -153,8 +140,8 @@ class Wavefield_1D():
         ax.set_xlim([np.min(self.P)-0.5, np.max(self.P)+0.5])
 
         wave, = ax.plot(self.P[:,0], self.depth)
-        srcs, = ax.plot(self.P[self.src_projection,0], self.fonte, "*", color = "black", label = "Sources")
-        recs, = ax.plot(self.P[self.rec_projection,0], self.receptor, "v", color = "green", label = "Receivers")
+        srcs, = ax.plot(self.P[self.src_projection,0], self.src, "*", color = "black", label = "Sources")
+        recs, = ax.plot(self.P[self.rec_projection,0], self.rec, "v", color = "green", label = "Receivers")
 
         artists_list = []
 
