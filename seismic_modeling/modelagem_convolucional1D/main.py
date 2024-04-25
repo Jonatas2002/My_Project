@@ -1,20 +1,21 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from function import Ricker
+from function import Ricker2
 from function import reflectivity
 from function import wiggle
 
 # Parametros da wavelet
-T = 1   # tempo em segundos
+T = 0.4   # tempo em segundos
 dt = 1/500  # taxa de amostragem
 nt = int((T/dt) + 1) # numero de amostra
 t = np.linspace(0, T, nt, endpoint=False)   #base de tempo
 tlag= 0.5 # Deslocamento no tempo em segundo
 
-fs = 30  #frequencia do sinal ricker
+fs = 25  #frequencia do sinal ricker
 
 # Função Wavelet Ricker
-R = Ricker(fs, t-tlag)
+R = Ricker2(fs, t)
 
 # Trasnformada de Fourier da Ricker
 freq = np.fft.fftfreq(nt, dt)
@@ -33,7 +34,7 @@ plt.legend(loc='upper right', fontsize=11)
 
 plt.subplot(122)
 plt.title('FFT da Ricker', fontsize=12)
-plt.plot(freq[mascara], Amplitude[mascara], 'b',  label="Ricker \nfs = {} Hz".format(fs))
+plt.plot(freq[mascara], Amplitude[mascara], 'b',  label="Ricker \nfreq_corte = {} Hz".format(fs))
 plt.xlabel('Frequencia (hz)', fontsize=10)
 plt.ylabel('Amplitude', fontsize=10)  
 plt.legend(loc='upper right', fontsize=11)
@@ -138,7 +139,9 @@ trace2D = (np.array([trace]*nx).T)
 
 plt.figure(figsize=(15, 10))
 plt.title("Plot Wiggle")
-wiggle(trace2D, depth1, xx=None, color='k', sf=0.10, verbose=False)
+wiggle(trace2D, depth1, xx=None, color='k', sf=0.15, verbose=False)
+plt.xlabel("Traços")
+plt.ylabel("Profundidade")
 plt.tight_layout()
 plt.show()
 

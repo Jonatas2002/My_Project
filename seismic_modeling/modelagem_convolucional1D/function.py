@@ -161,6 +161,14 @@ def Ricker(fs,t):
     R = (1 - 2 * np.pi**2 * fs**2 * t**2 ) * (np.exp(-np.pi**2 * fs**2 * t**2))
     return R
 
+def Ricker2(f_max,t):
+    fc = f_max / (3 * np.sqrt(np.pi))
+    t0 = 2*np.pi / f_max
+    td = t - t0
+    R = (1 - (2 * np.pi * ((np.pi * fc * td)**2))) * (np.exp(-np.pi * (np.pi * fc * td)**2))
+    
+    return R
+
 
 # Calculo da Refletividade
 def reflectivity(velocidade, densidade):
