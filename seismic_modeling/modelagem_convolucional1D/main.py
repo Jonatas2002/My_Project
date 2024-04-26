@@ -6,11 +6,11 @@ from function import reflectivity
 from function import wiggle
 
 # Parametros da wavelet
-T = 0.4   # tempo em segundos
+T = 1   # tempo em segundos
 dt = 1/500  # taxa de amostragem
 nt = int((T/dt) + 1) # numero de amostra
 t = np.linspace(0, T, nt, endpoint=False)   #base de tempo
-tlag= 0.5 # Deslocamento no tempo em segundo
+#tlag= 0.5 # Deslocamento no tempo em segundo
 
 fs = 25  #frequencia do sinal ricker
 
@@ -48,8 +48,8 @@ dado2 = np.loadtxt('seismic_modeling/modelagem_convolucional1D/dados/1ess53ess_2
 # convertendo para o sistema SI
 depth1 = dado1[11741:,0]
 dt = dado1[11741:,1]
-#vel = dt * 3.2808*10**(-6)
-vel = 3048/dt
+
+vel = (304.8 / dt) * 1000
 
 depth2 = dado2[:-45,0]
 rhob = dado2[:-45,1] * 1000
