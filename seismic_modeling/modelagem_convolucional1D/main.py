@@ -4,6 +4,7 @@ from function import Ricker
 from function import Ricker2
 from function import reflectivity
 from function import wiggle
+from function import plot_logplot
 
 # Parametros da wavelet
 T = 1   # tempo em segundos
@@ -97,7 +98,7 @@ plt.plot(refletividade,depth1)
 plt.title('Refletividade')
 #plt.yticks([])  # Remova as marcações do eixo y
 plt.xlabel('Refletividade (kg/m³)')
-#plt.ylabel('Tempo (s)')
+plt.ylim(3400,3200)
 plt.gca().invert_yaxis()
 
 plt.subplot(1,5,5)
@@ -106,6 +107,8 @@ plt.title('Traço Sismico (Ricker)')
 #plt.yticks([])  # Remova as marcações do eixo y
 plt.xlabel('Traço Sismico')
 #plt.ylabel('Tempo (s)')
+plt.ylim(3400,3200)
+
 plt.legend(loc='upper right', fontsize=11)
 plt.gca().invert_yaxis()
 
@@ -134,14 +137,25 @@ plt.show()
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
 """Modelagem Convolucional 2D - Wiggle"""
-nx = 50  # quantidade de traços sismicos
+nx = 2  # quantidade de traços sismicos
 trace2D = (np.array([trace]*nx).T)
 
-plt.figure(figsize=(15, 10))
+plt.figure(figsize=(3, 10))
 plt.title("Plot Wiggle")
 wiggle(trace2D, depth1, xx=None, color='k', sf=0.15, verbose=False)
 plt.xlabel("Traços")
 plt.ylabel("Profundidade")
+plt.ylim(3400,3200)
 plt.tight_layout()
+#plt.show()
+
+fig, ax = plt.subplots(figsize=(2,9), sharey=True)
+      
+ax.set_xlabel("Synthetic seismogram")
+ax.plot(trace, depth1[0:], lw=1, color='black')  
+ax.fill_betweenx(depth1[0:], trace, 0., trace > 0, color='black')
+#ax.fill_betweenx(depth1[0:], trace, 0., trace < 0, color='red')
+
+ax.set_ylim(3400,3200)
 plt.show()
 
