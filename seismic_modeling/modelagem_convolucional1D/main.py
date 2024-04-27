@@ -4,7 +4,6 @@ from function import Ricker
 from function import Ricker2
 from function import reflectivity
 from function import wiggle
-from function import plot_logplot
 
 # Parametros da wavelet
 T = 1   # tempo em segundos
@@ -155,6 +154,7 @@ ax.set_xlabel("Synthetic seismogram")
 ax.plot(trace, depth1[0:], lw=1, color='black')  
 ax.fill_betweenx(depth1[0:], trace, 0., trace > 0, color='black')
 #ax.fill_betweenx(depth1[0:], trace, 0., trace < 0, color='red')
+
 
 ax.set_ylim(3400,3200)
 plt.show()
