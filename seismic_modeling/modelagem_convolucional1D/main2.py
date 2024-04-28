@@ -24,20 +24,19 @@ Y = np.fft.fft(R)
 Amplitude = np.abs(Y / nt)
 
 # Plot wavelet ricker
-plt.figure(figsize=(10,3))
-plt.subplot(121)
-plt.title('Wavelet Ricker', fontsize=12)
-plt.plot(t, R, 'b',  label="Ricker \nfs = {} Hz".format(fs))
-plt.xlabel('tempo (s)', fontsize=10) # Legenda do eixo x
-plt.ylabel('Amplitude', fontsize=10)  # Legenda do eixo y
-plt.legend(loc='upper right', fontsize=11)
+fig, ax = plt.subplots(ncols=2,nrows=1,figsize=(10,3))
 
-plt.subplot(122)
-plt.title('FFT da Ricker', fontsize=12)
-plt.plot(freq[mascara], Amplitude[mascara], 'b',  label="Ricker \nfreq_corte = {} Hz".format(fs))
-plt.xlabel('Frequencia (hz)', fontsize=10)
-plt.ylabel('Amplitude', fontsize=10)  
-plt.legend(loc='upper right', fontsize=11)
+ax[0].set_title('Wavelet Ricker', fontsize=12)
+ax[0].plot(t, R, 'b',  label="Ricker \nfs = {} Hz".format(fs))
+ax[0].set_xlabel('tempo (s)', fontsize=10) # Legenda do eixo x
+ax[0].set_ylabel('Amplitude', fontsize=10)  # Legenda do eixo y
+ax[0].legend(loc='upper right', fontsize=11)
+
+ax[1].set_title('FFT da Ricker', fontsize=12)
+ax[1].plot(freq[mascara], Amplitude[mascara], 'b',  label="Ricker \nfreq_corte = {} Hz".format(fs))
+ax[1].set_xlabel('Frequencia (hz)', fontsize=10)
+ax[1].set_ylabel('Amplitude', fontsize=10)  
+ax[1].legend(loc='upper right', fontsize=11)
 
 plt.show()
 
@@ -45,17 +44,30 @@ plt.show()
 dado1 = np.loadtxt('seismic_modeling/modelagem_convolucional1D/dados/1ess53ess_1.las.txt', skiprows=37)
 dado2 = np.loadtxt('seismic_modeling/modelagem_convolucional1D/dados/1ess53ess_2.las.txt', skiprows=37)
 
-# convertendo para o sistema SI
-depth1 = dado1[11741:,0]
-dt = dado1[11741:,1]
+# depth_min = 2836
+# depth_max = 4334
+depth_min = 2836
+depth_max = 3000
 
-vel = (304.8 / dt) * 1000
 
+DT_min = np.array(np.where(dado1[:, 0] >= depth_min))[0][0]
+DT_max = np.array(np.where(dado1[:, 0] <= depth_max))[0][-1]
 
-depth2 = dado2[:-45,0]
-rhob = dado2[:-45,1] * 1000
-print(rhob)
-exit()
+RHOB_min = np.array(np.where(dado2[:, 0] >= depth_min))[0][0]
+RHOB_max = np.array(np.where(dado2[:, 0] <= depth_max))[0][-1]
+
+#depth1 = dado1[(dado1[:, 0] >= depth_min) & (dado1[:, 0] <= depth_max)]
+D_min = np.array(np.where(dado1[:, 0] >= depth_min))[0][0]
+D_max = np.array(np.where(dado1[:, 0] <= depth_max))[0][-1]
+
+depth1 = dado1[D_min:D_max + 1,0]
+DT = dado1[DT_min:DT_max + 1,1]
+
+depth2 = dado2[(dado2[:, 0] >= depth_min) & (dado2[:, 0] <= depth_max)]
+rhob = dado2[RHOB_min:RHOB_max + 1,1] * 1000
+vel = (304.8 / DT) * 1000
+
+print(np.min(depth1))
 
 # Calculo da Impedância e Refletividade
 z = vel*rhob  # Calculo da Impedância
@@ -100,7 +112,7 @@ plt.plot(refletividade,depth1)
 plt.title('Refletividade')
 #plt.yticks([])  # Remova as marcações do eixo y
 plt.xlabel('Refletividade (kg/m³)')
-plt.ylim(3400,3200)
+#plt.ylim(3400,3200)
 plt.gca().invert_yaxis()
 
 plt.subplot(1,5,5)
@@ -109,7 +121,7 @@ plt.title('Traço Sismico (Ricker)')
 #plt.yticks([])  # Remova as marcações do eixo y
 plt.xlabel('Traço Sismico')
 #plt.ylabel('Tempo (s)')
-plt.ylim(3400,3200)
+#plt.ylim(3400,3200)
 
 plt.legend(loc='upper right', fontsize=11)
 plt.gca().invert_yaxis()
@@ -147,7 +159,7 @@ plt.title("Plot Wiggle")
 wiggle(trace2D, depth1, xx=None, color='k', sf=0.15, verbose=False)
 plt.xlabel("Traços")
 plt.ylabel("Profundidade")
-plt.ylim(3400,3200)
+#plt.ylim(3400,3200)
 plt.tight_layout()
 #plt.show()
 
@@ -159,6 +171,6 @@ ax.fill_betweenx(depth1[0:], trace, 0., trace > 0, color='black')
 #ax.fill_betweenx(depth1[0:], trace, 0., trace < 0, color='red')
 
 
-ax.set_ylim(3400,3200)
+#ax.set_ylim(3400,3200)
 plt.show()
 
