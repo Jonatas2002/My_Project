@@ -1,6 +1,4 @@
 import numpy as np
-
-import numpy as np
 import matplotlib.pyplot as plt
 
 def insert_zeros(trace, tt=None):
@@ -32,7 +30,6 @@ def insert_zeros(trace, tt=None):
             (trace_zi, np.zeros(1), trace_split[i + 1]))
 
     return trace_zi, tt_zi
-
 
 def wiggle_input_check(data, tt, xx, sf, verbose):
     ''' Helper function for wiggle() and traces() to check input
@@ -93,7 +90,6 @@ def wiggle_input_check(data, tt, xx, sf, verbose):
 
     return data, tt, xx, ts
 
-
 def wiggle(data, tt=None, xx=None, color='k', sf=0.15, verbose=False):
     '''Wiggle plot of a sesimic data section
 
@@ -148,8 +144,8 @@ def wiggle(data, tt=None, xx=None, color='k', sf=0.15, verbose=False):
     ax.set_ylim(tt[0], tt[-1])
     ax.invert_yaxis()
     
-# -----------------------------------------------------------
-# -----------------------------------------------------------
+#-------------------------------------------------------------------------------------#
+#-------------------------------------------------------------------------------------#
 
 # Definindo as funções
 
@@ -169,8 +165,30 @@ def Ricker2(f_max,t):
     
     return R
 
+def plot_wavelet(wavelet, f_max, t, nt, dt):
 
-# Calculo da Refletividade
+    freq = np.fft.fftfreq(nt, dt)
+    mascara = freq > 0
+    Y = np.fft.fft(wavelet)
+    Amplitude = np.abs(Y / nt)
+    
+    # Plot wavelet ricker
+    fig, ax = plt.subplots(ncols=2,nrows=1,figsize=(10,3))
+
+    ax[0].set_title('Wavelet Ricker', fontsize=12)
+    ax[0].plot(t, wavelet, 'b',  label="Ricker \nfs = {} Hz".format(f_max))
+    ax[0].set_xlabel('tempo (s)', fontsize=10) # Legenda do eixo x
+    ax[0].set_ylabel('Amplitude', fontsize=10)  # Legenda do eixo y
+    ax[0].legend(loc='upper right', fontsize=11)
+
+    ax[1].set_title('FFT da Ricker', fontsize=12)
+    ax[1].plot(freq[mascara], Amplitude[mascara], 'b',  label="Ricker \nfreq_corte = {} Hz".format(f_max))
+    ax[1].set_xlabel('Frequencia (hz)', fontsize=10)
+    ax[1].set_ylabel('Amplitude', fontsize=10)  
+    ax[1].legend(loc='upper right', fontsize=11)
+
+    plt.show()
+    
 def reflectivity(velocidade, densidade):
     z = densidade * velocidade
     refl = np.zeros(len(z))
@@ -181,5 +199,66 @@ def reflectivity(velocidade, densidade):
         refl[i] = (z2 - z1) / (z2 + z1)
 
     return refl
-# ----------------------------------------------------
-# ----------------------------------------------------
+
+def plot_modelelo_convolucional_1D(VP, RHOB, DEPTH, z, refletividade, trace, fs):
+    # Plots
+    fig, ax = plt.subplots(ncols=5,nrows=1,figsize=(18,10))
+
+    # Plot Perfil de Velocidade
+    ax[0].plot(VP,DEPTH)
+    ax[0].set_title('VP')
+    ax[0].set_xlabel('Velocidade (m/s)')
+    ax[0].set_ylabel('Profundidade (m)')
+    plt.gca().invert_yaxis()
+
+    # Plot Perfil de Densidade
+    ax[1].plot(RHOB,DEPTH)
+    ax[1].set_title('RHOB')
+    ax[1].set_xlabel('Densidade (kg/m³)')
+    plt.gca().invert_yaxis()
+
+    ax[2].plot(z,DEPTH)
+    ax[2].set_title('Impedância')
+    ax[2].set_xlabel('Impedância Acustica')
+    plt.gca().invert_yaxis()
+
+    # Plot Refletividade de Camadas
+    ax[3].plot(refletividade,DEPTH)
+    ax[3].set_title('Refletividade')
+    ax[3].set_xlabel('Refletividade (kg/m³)')
+    plt.gca().invert_yaxis()
+
+    #ax[4].plot(trace, DEPTH,'b', label='Ricker {} Hz'.format(fs))
+    ax[4].plot(trace, DEPTH[0:], lw=1, color='black')  
+    ax[4].fill_betweenx(DEPTH[0:], trace, 0., trace > 0, color='black', label='Ricker {} Hz'.format(fs))
+    #ax.fill_betweenx(depth1[0:], trace, 0., trace < 0, color='red')
+    ax[4].set_title('Traço Sismico (Ricker)')
+    ax[4].set_xlabel('Traço Sismico')
+    ax[4].legend(loc='upper right', fontsize=11)
+    plt.gca().invert_yaxis()
+
+    plt.tight_layout()
+    plt.show()
+    
+def ajustes(depth_min, depth_max):
+    dado1 = np.loadtxt('seismic_modeling/modelagem_convolucional1D/dados/1ess53ess_1.las.txt', skiprows=37)
+    dado2 = np.loadtxt('seismic_modeling/modelagem_convolucional1D/dados/1ess53ess_2.las.txt', skiprows=37)
+    
+    DT_min = np.array(np.where(dado1[:, 0] >= depth_min))[0][0]
+    DT_max = np.array(np.where(dado1[:, 0] <= depth_max))[0][-1]
+
+    RHOB_min = np.array(np.where(dado2[:, 0] >= depth_min))[0][0]
+    RHOB_max = np.array(np.where(dado2[:, 0] <= depth_max))[0][-1]
+
+    D_min = np.array(np.where(dado1[:, 0] >= depth_min))[0][0]
+    D_max = np.array(np.where(dado1[:, 0] <= depth_max))[0][-1]
+
+    DEPTH1 = dado1[D_min:D_max + 1,0]
+    DT = dado1[DT_min:DT_max + 1,1]
+
+    DEPTH2  = dado2[(dado2[:, 0] >= depth_min) & (dado2[:, 0] <= depth_max)]
+    RHOB = dado2[RHOB_min:RHOB_max + 1,1] * 1000
+
+    VP = (304.8 / DT) * 1000
+    
+    return VP, RHOB, DEPTH1 
