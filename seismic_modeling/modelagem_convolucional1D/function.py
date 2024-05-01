@@ -200,42 +200,42 @@ def reflectivity(velocidade, densidade):
 
     return refl
 
-def plot_modelelo_convolucional_1D(VP, RHOB, DEPTH, z, refletividade, trace, fs):
+def plot_modelelo_convolucional_1D(VP, RHOB, DEPTH, z, refletividade, trace):
     # Plots
-    fig, ax = plt.subplots(ncols=5,nrows=1,figsize=(18,10))
+    fig, ax = plt.subplots(ncols=5,nrows=1,figsize=(16,10))
 
     # Plot Perfil de Velocidade
     ax[0].plot(VP,DEPTH)
     ax[0].set_title('VP')
     ax[0].set_xlabel('Velocidade (m/s)')
     ax[0].set_ylabel('Profundidade (m)')
-    plt.gca().invert_yaxis()
+    ax[0].invert_yaxis()
 
     # Plot Perfil de Densidade
     ax[1].plot(RHOB,DEPTH)
     ax[1].set_title('RHOB')
     ax[1].set_xlabel('Densidade (kg/m³)')
-    plt.gca().invert_yaxis()
+    ax[1].invert_yaxis()
 
     ax[2].plot(z,DEPTH)
     ax[2].set_title('Impedância')
     ax[2].set_xlabel('Impedância Acustica')
-    plt.gca().invert_yaxis()
+    ax[2].invert_yaxis()
 
     # Plot Refletividade de Camadas
     ax[3].plot(refletividade,DEPTH)
     ax[3].set_title('Refletividade')
     ax[3].set_xlabel('Refletividade (kg/m³)')
-    plt.gca().invert_yaxis()
+    ax[3].invert_yaxis()
 
     #ax[4].plot(trace, DEPTH,'b', label='Ricker {} Hz'.format(fs))
     ax[4].plot(trace, DEPTH[0:], lw=1, color='black')  
-    ax[4].fill_betweenx(DEPTH[0:], trace, 0., trace > 0, color='black', label='Ricker {} Hz'.format(fs))
+    ax[4].fill_betweenx(DEPTH[0:], trace, 0., trace > 0, color='black')
     #ax.fill_betweenx(depth1[0:], trace, 0., trace < 0, color='red')
-    ax[4].set_title('Traço Sismico (Ricker)')
+    ax[4].set_title('Traço Sismico')
     ax[4].set_xlabel('Traço Sismico')
-    ax[4].legend(loc='upper right', fontsize=11)
-    plt.gca().invert_yaxis()
+    ax[4].invert_yaxis()
+
 
     plt.tight_layout()
     plt.show()
@@ -262,3 +262,21 @@ def ajustes(depth_min, depth_max):
     VP = (304.8 / DT) * 1000
     
     return VP, RHOB, DEPTH1 
+
+def plot_fft(data, dt):
+    # Trasnformada de Fourier da Ricker
+    freq_trace = np.fft.fftfreq(len(data), dt)
+    mascara_trace = freq_trace > 0
+    Y_trace = np.fft.fft(data)
+    Amplitude_trace = np.abs(Y_trace / len(data))
+
+    fig, ax = plt.subplots()
+
+    ax.set_title("Espectro de Frequência", fontsize=12)
+    ax.plot(freq_trace[mascara_trace], Amplitude_trace[mascara_trace], 'b')
+    ax.set_xlabel('Frequencia (hz)', fontsize=10)
+    ax.set_ylabel('Amplitude', fontsize=10)
+    #ax.set_xlim(0,50)  
+    ax.legend(loc='upper right', fontsize=11)
+    plt.show()
+    

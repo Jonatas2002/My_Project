@@ -8,17 +8,17 @@ from function import reflectivity
 from function import plot_modelelo_convolucional_1D
 from function import wiggle
 from function import ajustes
-
+from function import plot_fft
 # Parametros da modelagem
 TIME = 1                                        # tempo em segundos
 dt = 0.002                                      # taxa de amostragem
 fs = 25                                         # Frequencia do sinal ricker
 
-depth_min = 2836                               # PROF_MIN = 2836
-depth_max = 4334                               # PROF_MAX = 4334
+depth_min = 2836                                # PROF_MIN = 2836
+depth_max = 4334                                # PROF_MAX = 4334
 
-nt = int((TIME/dt) + 1)                        # numero de amostra
-t = np.linspace(0, TIME, nt, endpoint=False)   # base de tempo
+nt = int((TIME/dt) + 1)                         # numero de amostra
+t = np.linspace(0, TIME, nt, endpoint=False)    # base de tempo
 
 # Função Wavelet Ricker
 R = Ricker2(fs,t)
@@ -32,7 +32,16 @@ z = vel*rhob
 refletividade =  reflectivity(vel, rhob)
 trace = np.convolve(R, refletividade, mode='same')
 
-plot_modelelo_convolucional_1D(vel, rhob, depth1, z, refletividade, trace, fs)
+plot_modelelo_convolucional_1D(vel, rhob, depth1, z, refletividade, trace)
+
+plot_fft(trace, dt)
+
+plot_fft(refletividade, dt)
+
+
+plt.figure()
+plt.hist(refletividade,bins=1000)
+plt.show()
 
 #----------------------------------------------------------------------------------------------------------------
 """Modelagem Convolucional 2D - Wiggle"""
