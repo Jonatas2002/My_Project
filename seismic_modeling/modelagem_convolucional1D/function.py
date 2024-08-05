@@ -279,4 +279,34 @@ def plot_fft(data, dt):
     #ax.set_xlim(0,50)  
     ax.legend(loc='upper right', fontsize=11)
     plt.show()
+
+
+    # Modelo 1D
+def model_1D(nz, dx, dimensao, valor):
+    """ Função responsavel pela criação de matrizes 1D utilizada para contrução de modelos
+        de velocidade, densidade e outras utilidades"""
+    M = np.zeros(nz)
     
+    for i in range(len(dimensao)):
+        start_dimensao = int(dimensao[i - 1] / dx) if i > 0 else 0
+        end_dimensao = int(dimensao[i] // dx)
+        M[start_dimensao:end_dimensao] = valor[i]
+
+    return M
+    
+def gaussian_noise(signal, snr_dB):
+    # calcular potencia do sinal
+    signal_power = np.mean(np.square(signal))
+
+    # Converter SNR de dB para uma escala linear
+    snr_linear = 10 ** (snr_dB / 10)
+
+    noise_power = signal_power / snr_linear
+
+    # Gerar ruído Gaussiano
+    noise = np.random.normal(0, np.sqrt(noise_power), size=signal.shape)
+
+    # adicionar ruido no dado
+    data_noise = signal + noise
+
+    return data_noise
